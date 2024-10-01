@@ -1,19 +1,17 @@
 const pool = require("../config/db.config");
 const crypto = require("crypto");
 const emailService = require("../utils/email.utils");
-const bcrypt = require('bcrypt')
-
+const {bcrypt} = require("../utils/bcrypt.utils.js");
 
 exports.registerUser = async (req, res) => {
   const { firstname, lastname, email, password } = req.body;
-  if(!firstname || !lastname || !email || !password === ""){
 
   try {
     const userExists = await pool.query("SELECT * FROM signup WHERE email = $1", [email]);
     if (userExists.rowCount > 0) {
       return res.status(409).json({ message: "User already exists" });
     }
-    const hashedPassword = await bcrypt.hash(password , 10);
+    const hashedPassword = await bcrypt(password , 10)
 
 
     const query = "INSERT INTO signup (firstname, lastname, email, password) VALUES ($1, $2, $3, $4)";
@@ -23,11 +21,6 @@ exports.registerUser = async (req, res) => {
     console.error("Error during registration", error);
     res.status(500).json({ message: "Server error" });
   }
-}else{
-    res.status(409).json({
-        message : "all field are require"
-    })
-}
 };
 
 
@@ -94,3 +87,5 @@ exports.resetPassword = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+
