@@ -1,0 +1,26 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "this is a backend project handle by sumit for squadminds",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js"
+  },
+  "keywords": [
+    "express",
+    "postgress",
+    "sql"
+  ],
+  "author": "Sumit Tiwari",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "nodemailer": "^6.9.15",
+    "nodemon": "^3.1.7",
+    "pg": "^8.13.0",
+    "pg-pool": "^3.7.0"
+  }
+}
