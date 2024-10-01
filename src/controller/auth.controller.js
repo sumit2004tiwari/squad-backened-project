@@ -6,6 +6,8 @@ const bcrypt = require('bcrypt')
 
 exports.registerUser = async (req, res) => {
   const { firstname, lastname, email, password } = req.body;
+  if(!firstname || !lastname || !email || !password === ""){
+
   try {
     const userExists = await pool.query("SELECT * FROM signup WHERE email = $1", [email]);
     if (userExists.rowCount > 0) {
@@ -21,6 +23,11 @@ exports.registerUser = async (req, res) => {
     console.error("Error during registration", error);
     res.status(500).json({ message: "Server error" });
   }
+}else{
+    res.status(409).json({
+        message : "all field are require"
+    })
+}
 };
 
 
