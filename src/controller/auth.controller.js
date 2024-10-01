@@ -69,7 +69,7 @@ exports.forgotPassword = async (req, res) => {
 exports.resetPassword = async (req, res) => {
   const token = req.params.token;
   const { newPassword } = req.body;
-  const hasPassword = await bcrypt.hash(newPassword , 10);
+  const hasPassword = await bcrypt(newPassword , 10);
   try {
     const user = await pool.query("SELECT * FROM signup WHERE resetToken = $1", [token]);
     if (user.rowCount === 0) {
