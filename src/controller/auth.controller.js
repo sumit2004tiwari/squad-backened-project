@@ -1,6 +1,7 @@
 const pool = require("../config/db.config");
 const crypto = require("crypto");
 const emailService = require("../utils/email.utils");
+const bcrypt = require('bcrypt')
 
 
 exports.registerUser = async (req, res) => {
@@ -10,9 +11,11 @@ exports.registerUser = async (req, res) => {
     if (userExists.rowCount > 0) {
       return res.status(409).json({ message: "User already exists" });
     }
+    const hashedPassword = await bcrypt.hash(password , 10);
+
 
     const query = "INSERT INTO signup (firstname, lastname, email, password) VALUES ($1, $2, $3, $4)";
-    await pool.query(query, [firstname, lastname, email, password]);
+    await pool.query(query, [firstname, lastname, email, hashedPassword]);
     res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
     console.error("Error during registration", error);
@@ -23,6 +26,7 @@ exports.registerUser = async (req, res) => {
 
 exports.loginUser = async (req, res) => {
   const { email, password } = req.body;
+
   try {
     const result = await pool.query("SELECT * FROM signup WHERE email = $1 AND password = $2", [email, password]);
     if (result.rowCount > 0) {
@@ -65,6 +69,7 @@ exports.forgotPassword = async (req, res) => {
 exports.resetPassword = async (req, res) => {
   const token = req.params.token;
   const { newPassword } = req.body;
+  const hasPassword = await bcrypt.hash(newPassword , 10);
   try {
     const user = await pool.query("SELECT * FROM signup WHERE resetToken = $1", [token]);
     if (user.rowCount === 0) {
@@ -73,7 +78,7 @@ exports.resetPassword = async (req, res) => {
 
     await pool.query(
       "UPDATE signup SET password = $1, resetToken = NULL, resetToken_expiry = NULL WHERE resetToken = $2",
-      [newPassword, token]
+      [hasPassword, token]
     );
 
     res.status(200).json({ message: "Password updated successfully" });
