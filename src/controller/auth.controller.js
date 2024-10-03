@@ -11,7 +11,7 @@ exports.registerUser = async (req, res) => {
     if (userExists.rowCount > 0) {
       return res.status(409).json({ message: "User already exists" });
     }
-    const hashedPassword = await bcrypt(password , 10)
+    const hashedPassword = await bcrypt(password )
 
 
     const query = "INSERT INTO signup (firstname, lastname, email, password) VALUES ($1, $2, $3, $4)";
@@ -51,14 +51,14 @@ exports.forgotPassword = async (req, res) => {
 
     const resetToken = crypto.randomBytes(32).toString("hex");
     await pool.query(
-      "UPDATE signup SET resetToken = $1, resetToken_expiry = NOW() + INTERVAL '24 hours' WHERE email = $2",
+      "UPDATE signup SET resetToken = $1, resetToken_expiry = NOW() + INTERVAL '24 hour' WHERE email = $2",
       [resetToken, email]
     );
 
     const resetUrl = `http://localhost:3000/api/resetPassword/${resetToken}`;
     await emailService.sendResetEmail(email, resetUrl);
 
-    res.status(200).json({ message: "Reset password link sent successfully" });
+    res.status(200).json({ message: "Reset password link sent successfully" , });
   } catch (error) {
     console.error("Error during password reset", error);
     res.status(500).json({ message: "Server error" });
@@ -69,9 +69,9 @@ exports.forgotPassword = async (req, res) => {
 exports.resetPassword = async (req, res) => {
   const token = req.params.token;
   const { newPassword } = req.body;
-  const hasPassword = await bcrypt(newPassword );
+  const hasPassword = await bcrypt(newPassword  , 10);
   try {
-    const user = await pool.query("SELECT * FROM signup WHERE resetToken = $1", [token]);
+    const user = await pool.query("SELECT * FROM signup WHERE resetToken = $1 AND resetToken_expiry > NOW()", [token]);
     if (user.rowCount === 0) {
       return res.status(404).json({ message: "Invalid or expired reset token" });
     }
