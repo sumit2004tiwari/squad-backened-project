@@ -1,8 +1,10 @@
 const pool = require("../config/db.config");
 const crypto = require("crypto");
 const emailService = require("../utils/email.utils");
-const { bcrypt } = require("../utils/bcrypt.utils.js");
-const bcrypt1 = require('bcrypt')
+const { bcrypt, bcryptCompare } = require("../utils/bcrypt.utils.js");
+const { generateToken } = require("../utils/generateToken.util");
+const { bcrypt1 } = require("bcrypt");
+const { METHODS, get } = require("http");
 
 exports.registerUser = async (req, res) => {
   const { firstname, lastname, email, password } = req.body;
@@ -30,17 +32,27 @@ exports.registerUser = async (req, res) => {
 exports.loginUser = async (req, res) => {
   const { email, password } = req.body;
   try {
-    const result = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
-  
+    const result = await pool.query("SELECT * FROM users WHERE email = $1", [
+      email,
+    ]);
+
     if (result.rowCount === 0) {
       return res.status(409).json({ message: "Invalid credentials" });
     }
 
     const user = result.rows[0];
+    console.log(user);
 
-    const passwordMatch = await bcrypt1.compare(password, user.password);
+    const passwordMatch = bcryptCompare(password, user.password);
 
     if (passwordMatch) {
+      const loginToken = 'tokrn hu';
+      res.cookie("token", loginToken, {
+        METHODS : get,
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000,
+        
+      });
       res.status(200).json({ message: "Login successful" });
     } else {
       res.status(409).json({ message: "Invalid credentials" });
