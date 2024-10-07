@@ -120,7 +120,7 @@ exports.resetPassword = async (req, res) => {
 };
 
 exports.logoutUser = async (req, res) => {
-  const { token } = req.cookies;
+  const { token } = req.body;
 
   try {
     if (!token) {
@@ -132,7 +132,7 @@ exports.logoutUser = async (req, res) => {
     if (!tokencheck) {
       return res.status(400).json({ message: "token is invalid or expire" });
     }
-    
+
     const query = `UPDATE users Set logintoken = NULL  WHERE logintoken = $1`;
     await pool.query(query, [token]);
     res.clearCookie("token");
