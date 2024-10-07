@@ -1,6 +1,6 @@
 const { body, validationResult } = require("express-validator");
 
-const validateEmail = () => {
+const  validateEmail = () => {
   return body("email")
     .trim()
     .notEmpty()
