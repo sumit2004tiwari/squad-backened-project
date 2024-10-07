@@ -5,5 +5,6 @@ const router = express.Router();
 // property router
 router.post("/property" , propertyController.propertyData);
 router.post("/roomdata/:propertyid" , propertyController.roomData)
+router.get("/getRoomdata" , propertyController.getRoomData)
 
 module.exports = router;

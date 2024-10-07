@@ -72,5 +72,6 @@ exports.roomData = async (req, res) => {
 
 exports.getRoomData = async (req, res) => {
   const query = `select * from room`;
-  await pool.query(query);
+  const rentRoomData = await pool.query(query);
+  res.status(200).json({message: rentRoomData , })
 };
