@@ -5,8 +5,9 @@ const jwt = require("jsonwebtoken");
 exports.validate = async (req, res, next) => {
   const {babu} = req.body;
   console.log("babu bhaiya" , babu);
-  const token = req.cookies;
-
+  console.log(req.cookies)
+  const {token} = req.cookies;
+  
   console.log(token, "token >>>>>>>>>>>>>>");
 
   // Check if token exists

@@ -9,12 +9,13 @@ router.get("/validation" ,  validation.validate)
 
 // user router 
 router.post("/submit", authController.registerUser);
-router.post("/login", authController.loginUser );
+router.patch("/login", authController.loginUser );
 router.post("/forgotPassword", authController.forgotPassword);
 router.patch("/resetPassword/:token", authController.resetPassword);
+router.patch("/logout" , authController.logoutUser)
 
 // property router 
 
-router.post("/property" ,validation.validate , propertyController.propertyData);
+router.get("/property" ,validation.validate , propertyController.propertyData);
 
 module.exports = router;

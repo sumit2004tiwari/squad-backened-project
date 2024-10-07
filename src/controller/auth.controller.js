@@ -46,12 +46,15 @@ exports.loginUser = async (req, res) => {
     const passwordMatch = bcryptCompare(password, user.password);
 
     if (passwordMatch) {
-      const loginToken = 'tokrn hu';
-      res.cookie("token", loginToken, {
-        METHODS : get,
+      const loginToken = "tokrn hu";
+      const token = await bcrypt(loginToken);
+      const query = `UPDATE users SET logintoken = $1 WHERE email = $2`;
+      await pool.query(query, [token, email]);
+
+      res.cookie("token", token, {
+        METHODS: get,
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000,
-        
       });
       res.status(200).json({ message: "Login successful" });
     } else {
@@ -113,5 +116,30 @@ exports.resetPassword = async (req, res) => {
   } catch (error) {
     console.error("Error updating password", error);
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+exports.logoutUser = async (req, res) => {
+  const { token } = req.cookies;
+
+  try {
+    if (!token) {
+      return res.status(400).json({ message: "token not found" });
+    }
+    const queryCheck = `SELECT * FROM users WHERE logintoken = $1`;
+    const tokencheck = await pool.query(queryCheck, [token]);
+
+    if (!tokencheck) {
+      return res.status(400).json({ message: "token is invalid or expire" });
+    }
+    
+    const query = `UPDATE users Set logintoken = NULL  WHERE logintoken = $1`;
+    await pool.query(query, [token]);
+    res.clearCookie("token");
+    return res.status(200).json("Logout successfully");
+
+  } catch (error) {
+    console.error("Error logging out ", error);
+    return res.status(400).json("somthing went wrong during logout");
   }
 };
