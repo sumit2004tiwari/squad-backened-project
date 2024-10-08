@@ -42,7 +42,6 @@ exports.roomData = async (req, res) => {
     rent_history,
     sort_term_daily_rent,
     utility_history,
-    
   } = req.body;
 
   try {
@@ -58,7 +57,7 @@ exports.roomData = async (req, res) => {
       rent_history,
       sort_term_daily_rent,
       utility_history,
-      propertyId
+      propertyId,
     ]);
 
     return res.status(200).json("data send successfully");
@@ -71,7 +70,67 @@ exports.roomData = async (req, res) => {
 };
 
 exports.getRoomData = async (req, res) => {
-  const query = `select * from room`;
-  const rentRoomData = await pool.query(query);
-  res.status(200).json({message: rentRoomData , })
+  const query = `SELECT * FROM room`;
+  try {
+    const rentRoomData = await pool.query(query);
+
+    res.status(200).json({
+      success: true,
+      data: rentRoomData.rows,
+      message: "Rooms fetched successfully",
+    });
+  } catch (error) {
+    console.error("Error fetching room data:", error.message);
+
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while fetching room data",
+    });
+  }
+};
+
+exports.updateRoom = async (req, res) => {
+  const { propertyid , roomid} = req.params;
+  
+  if (!propertyid || !roomid) {
+    return res
+      .status(404)
+      .json({ message: " propertyid or roomid are required" });
+  }
+  const {
+    room_type,
+    room_size_sqm,
+    room_size_jou,
+    bed,
+    rent_history,
+    sort_term_daily_rent,
+    utility_history,
+  } = req.body;
+  try {
+    
+    
+    const query = `UPDATE room SET  room_type = $1 , room_size_sqm = $2 , room_size_jou = $3 , bed = $4 , rent_history = $5 , sort_term_daily_rent  = $6 , utility_history = $7 WHERE room_id = $8 AND property_id = $9 `;
+    const result = await pool.query(query, [
+      room_type,
+      room_size_sqm,
+      room_size_jou,
+      bed,
+      rent_history,
+      sort_term_daily_rent,
+      utility_history,
+      roomid,
+      propertyid,
+    ]);
+     if(result.rowCount === 0){
+      return res.status(404).json({message : "room not found to update"})
+     }
+
+    return res.status(200).json({
+      message : "room id updated successfully"
+     })
+
+  } catch (error) {
+    console.log(error.stack);
+    return res.status(500).json({ messsage: "internal server error" });
+  }
 };
