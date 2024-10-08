@@ -8,6 +8,8 @@ router.post("/property" , propertyController.propertyData);
 // room data
 router.post("/roomdata/:propertyid" , propertyController.roomData);
 router.get("/getRoomdata" , propertyController.getRoomData);
-router.post("/updateRoomData/:propertyid/room/:roomid" , propertyController.updateRoom)
+router.patch("/updateRoomData/:propertyid/room/:roomid" , propertyController.updateRoom)
+router.delete("/deleteRoom/:roomid" ,  propertyController.deleteRoom)
+
 
 module.exports = router;
