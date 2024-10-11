@@ -5,6 +5,7 @@ const { bcrypt, bcryptCompare } = require("../utils/bcrypt.utils.js");
 const { generateToken } = require("../utils/generateToken.util");
 const { bcrypt1 } = require("bcrypt");
 const { METHODS, get } = require("http");
+const {InputFieldValidate} = require("../middelware/InputFieldValiditor.middelware")
 
 exports.registerUser = async (req, res) => {
   const { firstname, lastname, email, password } = req.body;
@@ -31,6 +32,7 @@ exports.registerUser = async (req, res) => {
 
 exports.loginUser = async (req, res) => {
   const { email, password } = req.body;
+  
   try {
     const result = await pool.query("SELECT * FROM users WHERE email = $1", [
       email,
@@ -56,7 +58,15 @@ exports.loginUser = async (req, res) => {
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000,
       });
-      res.status(200).json({ message: "Login successful" });
+      return res.status(200).json({
+        success: true,
+        status:200,
+        message: "User logged in successfully.",
+        user: {
+            id: user.id,
+            email: user.email
+        }
+    });
     } else {
       res.status(409).json({ message: "Invalid credentials" });
     }
