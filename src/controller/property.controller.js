@@ -16,7 +16,7 @@ exports.propertyData = async (req, res) => {
       street,
       detail,
     ]);
-    console.log("4>>>>>>>>>");
+   
     return res.status(200).json("data send successfully");
   } catch (error) {
     console.log(error.stack);

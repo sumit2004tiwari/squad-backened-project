@@ -11,7 +11,7 @@ const reportRoutes = require("./src/routes/report.route")
 
 const app = express();
 app.use(cors({
-  origin : "http://localhost:3001"
+  origin : "http://localhost:5173"
 }));
 app.use(cookieParser())
 const PORT = 8000;
